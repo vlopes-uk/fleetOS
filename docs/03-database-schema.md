@@ -1,7 +1,8 @@
 # Database Schema (SQL Server)
 
 **Database:** SQL Server 2022 / Azure SQL Database
-**Version:** 4.0 · **Companion to:** Requirements Documentation v4.0
+**Version:** 4.1 · **Companion to:** Requirements Documentation v4.0
+**Changes since 4.0:** Added `operators.default_profit_share_driver_pct` for operator-level profit-share default (see §3.1).
 
 ## Conventions
 
@@ -14,6 +15,7 @@
 | Unicode | `NVARCHAR` for names/addresses; `VARCHAR` for codes, emails, tokens |
 | Enums | `VARCHAR(30)` with `CHECK` constraint |
 | Money | `DECIMAL(12,2)` or `DECIMAL(10,2)` |
+| Percentages | `DECIMAL(5,2)` with `CHECK (0 <= x <= 100)` |
 | Identities | `BIGINT IDENTITY(1,1)` for log tables |
 | Indexes | Filtered indexes with `WHERE` for hot subsets |
 
@@ -43,17 +45,25 @@ billing_cycles ──1:N── payment_records
 
 ```sql
 CREATE TABLE operators (
-    id                  UNIQUEIDENTIFIER NOT NULL DEFAULT NEWSEQUENTIALID() PRIMARY KEY,
-    name                NVARCHAR(255) NOT NULL,
-    nif                 VARCHAR(9)    NOT NULL UNIQUE,
-    imt_licence_number  VARCHAR(50)   NULL,
-    imt_licence_expiry  DATE          NULL,
-    address             NVARCHAR(500) NULL,
-    email               VARCHAR(255)  NULL,
-    phone               VARCHAR(20)   NULL,
-    created_at          DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME(),
-    updated_at          DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME()
+    id                              UNIQUEIDENTIFIER NOT NULL DEFAULT NEWSEQUENTIALID() PRIMARY KEY,
+    name                            NVARCHAR(255) NOT NULL,
+    nif                             VARCHAR(9)    NOT NULL UNIQUE,
+    imt_licence_number              VARCHAR(50)   NULL,
+    imt_licence_expiry              DATE          NULL,
+    default_profit_share_driver_pct DECIMAL(5,2)  NULL
+        CHECK (default_profit_share_driver_pct IS NULL
+            OR (default_profit_share_driver_pct >= 0
+                AND default_profit_share_driver_pct <= 100)),
+    address                         NVARCHAR(500) NULL,
+    email                           VARCHAR(255)  NULL,
+    phone                           VARCHAR(20)   NULL,
+    created_at                      DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME(),
+    updated_at                      DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME()
 );
+
+-- default_profit_share_driver_pct semantics:
+--   NULL    = no operator default; profit-share contracts must specify their own pct
+--   0-100   = used as the fallback when a contract's profit_share_driver_pct is NULL
 
 CREATE TABLE users (
     id              UNIQUEIDENTIFIER NOT NULL DEFAULT NEWSEQUENTIALID() PRIMARY KEY,
@@ -215,12 +225,20 @@ CREATE TABLE contracts (
                             CHECK (status IN ('draft','active','suspended','terminated')),
     rental_weekly_rate      DECIMAL(10,2) NULL,
     rental_monthly_rate     DECIMAL(10,2) NULL,
-    profit_share_driver_pct DECIMAL(5,2)  NULL,
+    profit_share_driver_pct DECIMAL(5,2)  NULL
+        CHECK (profit_share_driver_pct IS NULL
+            OR (profit_share_driver_pct >= 0 AND profit_share_driver_pct <= 100)),
     base_salary             DECIMAL(10,2) NULL,
-    commission_pct          DECIMAL(5,2)  NULL,
+    commission_pct          DECIMAL(5,2)  NULL
+        CHECK (commission_pct IS NULL
+            OR (commission_pct >= 0 AND commission_pct <= 100)),
     notes                   NVARCHAR(MAX) NULL,
     created_at              DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME()
 );
+
+-- profit_share_driver_pct semantics:
+--   NULL    = fall back to operators.default_profit_share_driver_pct
+--   0-100   = overrides the operator default for this contract
 
 CREATE INDEX IX_contracts_driver_active ON contracts(driver_id) WHERE status = 'active';
 CREATE INDEX IX_contracts_vehicle       ON contracts(vehicle_id);
@@ -499,4 +517,29 @@ CREATE TABLE audit_log (
 
 CREATE INDEX IX_audit_entity ON audit_log(entity_type, entity_id, created_at DESC);
 CREATE INDEX IX_audit_time   ON audit_log(created_at DESC);
+```
+
+## Appendix: Migration for existing databases
+
+```sql
+-- Migration: add operator-level profit share default (v4.0 -> v4.1)
+ALTER TABLE operators
+    ADD default_profit_share_driver_pct DECIMAL(5,2) NULL;
+
+ALTER TABLE operators
+    ADD CONSTRAINT CK_operators_default_profit_share_driver_pct
+    CHECK (default_profit_share_driver_pct IS NULL
+        OR (default_profit_share_driver_pct >= 0
+            AND default_profit_share_driver_pct <= 100));
+
+-- Optional: add matching check constraint to contracts for consistency
+ALTER TABLE contracts
+    ADD CONSTRAINT CK_contracts_profit_share_driver_pct
+    CHECK (profit_share_driver_pct IS NULL
+        OR (profit_share_driver_pct >= 0 AND profit_share_driver_pct <= 100));
+
+ALTER TABLE contracts
+    ADD CONSTRAINT CK_contracts_commission_pct
+    CHECK (commission_pct IS NULL
+        OR (commission_pct >= 0 AND commission_pct <= 100));
 ```

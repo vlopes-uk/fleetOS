@@ -3,7 +3,8 @@
     Links parent-child relationships for the TVDE backlog using the GitHub REST API.
 .DESCRIPTION
     Standalone script. Uses POST /repos/{owner}/{repo}/issues/{parent}/sub_issues.
-    Idempotent: already-linked pairs return 422 and are counted as skipped.
+    Idempotent: if a child already has a parent (HTTP 422), it is counted as
+    "already linked" and skipped rather than aborting the run.
 
     Accepts Repo as "owner/repo", full URL, or git remote URL.
 
@@ -17,10 +18,13 @@
     Defaults to import-mapping.json in this script's folder.
 .PARAMETER Delay
     Seconds between API calls. Default 1.0.
+.PARAMETER ConflictsFile
+    Where to write the list of conflicts (children that already had a parent).
+    Defaults to link-conflicts.json in the script folder.
 .EXAMPLE
     .\link-backlog.ps1 -Repo "vlopes-uk/fleetOS"
 .EXAMPLE
-    .\link-backlog.ps1 -Repo "https://github.com/vlopes-uk/fleetOS"
+    .\link-backlog.ps1 -Repo "https://github.com/vlopes-uk/fleetOS" -Delay 0.5
 #>
 
 [CmdletBinding()]
@@ -29,7 +33,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Repo,
     [string]$MappingFile = '',
-    [double]$Delay = 1.0
+    [double]$Delay = 1.0,
+    [string]$ConflictsFile = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -61,6 +66,9 @@ if ([string]::IsNullOrWhiteSpace($CsvFile)) {
 }
 if ([string]::IsNullOrWhiteSpace($MappingFile)) {
     $MappingFile = Join-Path $scriptDir 'import-mapping.json'
+}
+if ([string]::IsNullOrWhiteSpace($ConflictsFile)) {
+    $ConflictsFile = Join-Path $scriptDir 'link-conflicts.json'
 }
 
 # ---- Verify prerequisites --------------------------------------------------
@@ -171,7 +179,14 @@ function Get-IssueDatabaseId {
         return $dbIdCache[$Number]
     }
 
+    # Suppress stderr-as-error behaviour for native calls
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+
     $idJson = gh api "repos/$Repo/issues/$Number" --jq '.id' 2>$null
+
+    $ErrorActionPreference = $prevEAP
+
     if ($LASTEXITCODE -ne 0 -or -not $idJson) {
         return $null
     }
@@ -189,6 +204,8 @@ $linked        = 0
 $alreadyLinked = 0
 $skipped       = 0
 $failed        = 0
+
+$conflicts = @()
 
 $total = $pairs.Count
 $index = 0
@@ -227,25 +244,56 @@ foreach ($pair in $pairs) {
     $apiPath = "repos/$Repo/issues/$parentNum/sub_issues"
     $body = "{`"sub_issue_id`":$childDbId}"
 
+    # Suppress Stop-on-stderr so 422s can be caught and handled below
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+
     $output = $body | gh api $apiPath --method POST --input - 2>&1
     $exitCode = $LASTEXITCODE
+
+    $ErrorActionPreference = $prevEAP
 
     if ($exitCode -eq 0) {
         Write-Host "       -> linked" -ForegroundColor DarkGreen
         $linked++
     }
-    elseif ("$output" -match '422|already|Validation Failed') {
-        Write-Host "       -> already linked (skipped)" -ForegroundColor DarkYellow
+    elseif ("$output" -match '422|already|Validation Failed|may only have one parent') {
+        Write-Host ("       -> SKIP #{0} (already has a parent)" -f $childNum) -ForegroundColor DarkYellow
         $alreadyLinked++
+        $conflicts += [PSCustomObject]@{
+            ChildTempId  = $childTemp
+            ChildNumber  = $childNum
+            ParentTempId = $parentTemp
+            ParentNumber = $parentNum
+            Reason       = 'already has a parent'
+        }
     }
     elseif ("$output" -match 'rate limit|429') {
         Write-Host "       !! rate limited, waiting 60s" -ForegroundColor DarkYellow
         Start-Sleep -Seconds 60
+
+        $prevEAP2 = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
         $output = $body | gh api $apiPath --method POST --input - 2>&1
-        if ($LASTEXITCODE -eq 0) {
+        $retryExit = $LASTEXITCODE
+        $ErrorActionPreference = $prevEAP2
+
+        if ($retryExit -eq 0) {
             Write-Host "       -> linked (retry)" -ForegroundColor DarkGreen
             $linked++
-        } else {
+        }
+        elseif ("$output" -match '422|already|may only have one parent') {
+            Write-Host ("       -> SKIP #{0} (already has a parent, retry)" -f $childNum) -ForegroundColor DarkYellow
+            $alreadyLinked++
+            $conflicts += [PSCustomObject]@{
+                ChildTempId  = $childTemp
+                ChildNumber  = $childNum
+                ParentTempId = $parentTemp
+                ParentNumber = $parentNum
+                Reason       = 'already has a parent (retry)'
+            }
+        }
+        else {
             Write-Host ("       !! failed on retry: {0}" -f $output) -ForegroundColor Red
             $failed++
         }
@@ -258,6 +306,13 @@ foreach ($pair in $pairs) {
     Start-Sleep -Milliseconds ([int]($Delay * 1000))
 }
 
+# ---- Write conflict report -------------------------------------------------
+if ($conflicts.Count -gt 0) {
+    $conflicts | ConvertTo-Json -Depth 3 | Out-File -FilePath $ConflictsFile -Encoding UTF8
+    Write-Host ""
+    Write-Host ("Conflict report written to {0}" -f $ConflictsFile) -ForegroundColor DarkGray
+}
+
 # ---- Summary ---------------------------------------------------------------
 Write-Host ""
 Write-Host "=== Done ===" -ForegroundColor Green
@@ -266,6 +321,12 @@ Write-Host ("  Already linked: {0}" -f $alreadyLinked) -ForegroundColor DarkYell
 Write-Host ("  Skipped:        {0}" -f $skipped)       -ForegroundColor DarkYellow
 Write-Host ("  Failed:         {0}" -f $failed)        -ForegroundColor $(if ($failed -gt 0) { 'Red' } else { 'Gray' })
 Write-Host ""
+
+if ($conflicts.Count -gt 0) {
+    Write-Host "Conflicting children (already had a parent):" -ForegroundColor Yellow
+    $conflicts | Format-Table ChildTempId, ChildNumber, ParentTempId, ParentNumber -AutoSize |
+        Out-String -Width 200 | Write-Host
+}
 
 if ($failed -eq 0) {
     Write-Host "Verify with:" -ForegroundColor Cyan

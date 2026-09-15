@@ -1,0 +1,520 @@
+﻿[
+    {
+        "ChildTempId":  "FEAT-1.1",
+        "ChildNumber":  13,
+        "ParentTempId":  "EPIC-1",
+        "ParentNumber":  1,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-1.2",
+        "ChildNumber":  14,
+        "ParentTempId":  "EPIC-1",
+        "ParentNumber":  1,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-1.3",
+        "ChildNumber":  15,
+        "ParentTempId":  "EPIC-1",
+        "ParentNumber":  1,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-1.4",
+        "ChildNumber":  16,
+        "ParentTempId":  "EPIC-1",
+        "ParentNumber":  1,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-1.1.1",
+        "ChildNumber":  17,
+        "ParentTempId":  "FEAT-1.1",
+        "ParentNumber":  13,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.1.1.1",
+        "ChildNumber":  18,
+        "ParentTempId":  "STORY-1.1.1",
+        "ParentNumber":  17,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.1.1.2",
+        "ChildNumber":  19,
+        "ParentTempId":  "STORY-1.1.1",
+        "ParentNumber":  17,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.1.1.3",
+        "ChildNumber":  20,
+        "ParentTempId":  "STORY-1.1.1",
+        "ParentNumber":  17,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.1.1.4",
+        "ChildNumber":  21,
+        "ParentTempId":  "STORY-1.1.1",
+        "ParentNumber":  17,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.1.1.5",
+        "ChildNumber":  22,
+        "ParentTempId":  "STORY-1.1.1",
+        "ParentNumber":  17,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-1.2.1",
+        "ChildNumber":  23,
+        "ParentTempId":  "FEAT-1.2",
+        "ParentNumber":  14,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.1",
+        "ChildNumber":  24,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.2",
+        "ChildNumber":  25,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.3",
+        "ChildNumber":  26,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.4",
+        "ChildNumber":  27,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.5",
+        "ChildNumber":  28,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.2.1.6",
+        "ChildNumber":  29,
+        "ParentTempId":  "STORY-1.2.1",
+        "ParentNumber":  23,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-1.3.1",
+        "ChildNumber":  30,
+        "ParentTempId":  "FEAT-1.3",
+        "ParentNumber":  15,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.1",
+        "ChildNumber":  31,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.2",
+        "ChildNumber":  32,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.3",
+        "ChildNumber":  33,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.4",
+        "ChildNumber":  34,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.5",
+        "ChildNumber":  35,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.3.1.6",
+        "ChildNumber":  36,
+        "ParentTempId":  "STORY-1.3.1",
+        "ParentNumber":  30,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-1.4.1",
+        "ChildNumber":  37,
+        "ParentTempId":  "FEAT-1.4",
+        "ParentNumber":  16,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.4.1.1",
+        "ChildNumber":  38,
+        "ParentTempId":  "STORY-1.4.1",
+        "ParentNumber":  37,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.4.1.2",
+        "ChildNumber":  39,
+        "ParentTempId":  "STORY-1.4.1",
+        "ParentNumber":  37,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.4.1.3",
+        "ChildNumber":  40,
+        "ParentTempId":  "STORY-1.4.1",
+        "ParentNumber":  37,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-1.4.1.4",
+        "ChildNumber":  41,
+        "ParentTempId":  "STORY-1.4.1",
+        "ParentNumber":  37,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-2.1",
+        "ChildNumber":  42,
+        "ParentTempId":  "EPIC-2",
+        "ParentNumber":  2,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-2.2",
+        "ChildNumber":  43,
+        "ParentTempId":  "EPIC-2",
+        "ParentNumber":  2,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-2.3",
+        "ChildNumber":  44,
+        "ParentTempId":  "EPIC-2",
+        "ParentNumber":  2,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-2.4",
+        "ChildNumber":  45,
+        "ParentTempId":  "EPIC-2",
+        "ParentNumber":  2,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-2.1.1",
+        "ChildNumber":  46,
+        "ParentTempId":  "FEAT-2.1",
+        "ParentNumber":  42,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.1",
+        "ChildNumber":  47,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.2",
+        "ChildNumber":  48,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.3",
+        "ChildNumber":  49,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.4",
+        "ChildNumber":  50,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.5",
+        "ChildNumber":  51,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.1.1.6",
+        "ChildNumber":  52,
+        "ParentTempId":  "STORY-2.1.1",
+        "ParentNumber":  46,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-2.2.1",
+        "ChildNumber":  53,
+        "ParentTempId":  "FEAT-2.2",
+        "ParentNumber":  43,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.2.1.1",
+        "ChildNumber":  54,
+        "ParentTempId":  "STORY-2.2.1",
+        "ParentNumber":  53,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.2.1.2",
+        "ChildNumber":  55,
+        "ParentTempId":  "STORY-2.2.1",
+        "ParentNumber":  53,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.2.1.3",
+        "ChildNumber":  56,
+        "ParentTempId":  "STORY-2.2.1",
+        "ParentNumber":  53,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.2.1.4",
+        "ChildNumber":  57,
+        "ParentTempId":  "STORY-2.2.1",
+        "ParentNumber":  53,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-2.3.1",
+        "ChildNumber":  58,
+        "ParentTempId":  "FEAT-2.3",
+        "ParentNumber":  44,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.3.1.1",
+        "ChildNumber":  59,
+        "ParentTempId":  "STORY-2.3.1",
+        "ParentNumber":  58,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.3.1.2",
+        "ChildNumber":  60,
+        "ParentTempId":  "STORY-2.3.1",
+        "ParentNumber":  58,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.3.1.3",
+        "ChildNumber":  61,
+        "ParentTempId":  "STORY-2.3.1",
+        "ParentNumber":  58,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.3.1.4",
+        "ChildNumber":  62,
+        "ParentTempId":  "STORY-2.3.1",
+        "ParentNumber":  58,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-2.4.1",
+        "ChildNumber":  63,
+        "ParentTempId":  "FEAT-2.4",
+        "ParentNumber":  45,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.4.1.1",
+        "ChildNumber":  64,
+        "ParentTempId":  "STORY-2.4.1",
+        "ParentNumber":  63,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.4.1.2",
+        "ChildNumber":  65,
+        "ParentTempId":  "STORY-2.4.1",
+        "ParentNumber":  63,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.4.1.3",
+        "ChildNumber":  66,
+        "ParentTempId":  "STORY-2.4.1",
+        "ParentNumber":  63,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.4.1.4",
+        "ChildNumber":  67,
+        "ParentTempId":  "STORY-2.4.1",
+        "ParentNumber":  63,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-2.4.1.5",
+        "ChildNumber":  68,
+        "ParentTempId":  "STORY-2.4.1",
+        "ParentNumber":  63,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-3.1",
+        "ChildNumber":  69,
+        "ParentTempId":  "EPIC-3",
+        "ParentNumber":  3,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-3.2",
+        "ChildNumber":  70,
+        "ParentTempId":  "EPIC-3",
+        "ParentNumber":  3,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-3.3",
+        "ChildNumber":  71,
+        "ParentTempId":  "EPIC-3",
+        "ParentNumber":  3,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "FEAT-3.4",
+        "ChildNumber":  72,
+        "ParentTempId":  "EPIC-3",
+        "ParentNumber":  3,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "STORY-3.1.1",
+        "ChildNumber":  73,
+        "ParentTempId":  "FEAT-3.1",
+        "ParentNumber":  69,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.1.1.1",
+        "ChildNumber":  74,
+        "ParentTempId":  "STORY-3.1.1",
+        "ParentNumber":  73,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.1.1.2",
+        "ChildNumber":  75,
+        "ParentTempId":  "STORY-3.1.1",
+        "ParentNumber":  73,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.1.1.3",
+        "ChildNumber":  76,
+        "ParentTempId":  "STORY-3.1.1",
+        "ParentNumber":  73,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.1.1.4",
+        "ChildNumber":  77,
+        "ParentTempId":  "STORY-3.1.1",
+        "ParentNumber":  73,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.1.1.5",
+        "ChildNumber":  52,
+        "ParentTempId":  "STORY-3.1.1",
+        "ParentNumber":  73,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-3.4.1.4",
+        "ChildNumber":  68,
+        "ParentTempId":  "STORY-3.4.1",
+        "ParentNumber":  89,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-5.3.1.6",
+        "ChildNumber":  103,
+        "ParentTempId":  "STORY-5.3.1",
+        "ParentNumber":  139,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-6.2.1.6",
+        "ChildNumber":  161,
+        "ParentTempId":  "STORY-6.2.1",
+        "ParentNumber":  162,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-6.5.1.5",
+        "ChildNumber":  144,
+        "ParentTempId":  "STORY-6.5.1",
+        "ParentNumber":  181,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-7.1.1.5",
+        "ChildNumber":  117,
+        "ParentTempId":  "STORY-7.1.1",
+        "ParentNumber":  190,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-9.2.1.3",
+        "ChildNumber":  66,
+        "ParentTempId":  "STORY-9.2.1",
+        "ParentNumber":  240,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-10.3.1.5",
+        "ChildNumber":  206,
+        "ParentTempId":  "STORY-10.3.1",
+        "ParentNumber":  270,
+        "Reason":  "already has a parent"
+    },
+    {
+        "ChildTempId":  "TASK-11.2.1.4",
+        "ChildNumber":  206,
+        "ParentTempId":  "STORY-11.2.1",
+        "ParentNumber":  284,
+        "Reason":  "already has a parent"
+    }
+]

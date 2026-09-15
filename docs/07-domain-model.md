@@ -127,6 +127,13 @@ public class Operator : BaseEntity
 
     public DateOnly? ImtLicenceExpiry { get; set; }
 
+    /// <summary>
+    /// Optional operator-wide default for the profit-share model.
+    /// Used as a fallback when a contract's <see cref="Contract.ProfitShareDriverPct"/>
+    /// is null. Expressed as the driver's share, 0-100.
+    /// </summary>
+    public decimal? DefaultProfitShareDriverPct { get; set; }
+
     [MaxLength(500)]
     public string? Address { get; set; }
 
@@ -408,11 +415,20 @@ public class Contract : BaseEntity
     public decimal? RentalWeeklyRate { get; set; }
     public decimal? RentalMonthlyRate { get; set; }
 
-    // Model 2 - Profit Share
+    /// <summary>
+    /// Driver's share of net revenue for the profit-share model, expressed
+    /// as a percentage (0-100). When null, the billing engine falls back to
+    /// <see cref="Operator.DefaultProfitShareDriverPct"/>.
+    /// </summary>
     public decimal? ProfitShareDriverPct { get; set; }
 
     // Model 3 - Salary + Percentage
     public decimal? BaseSalary { get; set; }
+
+    /// <summary>
+    /// Driver's commission on net revenue for the salary-plus model,
+    /// expressed as a percentage (0-100).
+    /// </summary>
     public decimal? CommissionPct { get; set; }
 
     public string? Notes { get; set; }
@@ -912,6 +928,16 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Vehicle>().HasIndex(v => v.LicensePlate).IsUnique();
         modelBuilder.Entity<Vehicle>().HasIndex(v => v.MaponUnitId)
             .IsUnique().HasFilter("[mapon_unit_id] IS NOT NULL");
+        modelBuilder.Entity<Operator>(e =>
+        {
+            e.Property(o => o.DefaultProfitShareDriverPct)
+                .HasPrecision(5, 2);
+        });
+        modelBuilder.Entity<Contract>(e =>
+        {
+            e.Property(c => c.ProfitShareDriverPct).HasPrecision(5, 2);
+            e.Property(c => c.CommissionPct).HasPrecision(5, 2);
+        });     
         modelBuilder.Entity<Trip>().HasIndex(t => t.PlatformTripId)
             .IsUnique().HasFilter("[platform_trip_id] IS NOT NULL");
         modelBuilder.Entity<BillingCycle>()

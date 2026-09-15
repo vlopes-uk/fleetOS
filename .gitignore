@@ -1,0 +1,13 @@
+# Windows
+Thumbs.db
+Desktop.ini
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PowerShell
+*.ps1.lock
+
+# Logs
+*.log

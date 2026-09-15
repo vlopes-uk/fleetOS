@@ -1,4 +1,5 @@
 using TvdeFleet.Blazor.Components;
+using TvdeFleetManagement.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TvdeFleet.Api/TvdeFleet.Api.csproj" />
+    <Project Path="src/TvdeFleet.Application/TvdeFleet.Application.csproj" Id="2bcede9d-5952-4dc8-bdf7-5b5b26e049d3" />
+    <Project Path="src/TvdeFleet.Blazor/TvdeFleet.Blazor.csproj" />
+    <Project Path="src/TvdeFleet.Domain/TvdeFleet.Domain.csproj" Id="df7ace81-b9e5-4731-aa15-fa05cbe85934" />
+    <Project Path="src/TvdeFleet.Functions/TvdeFleet.Functions.csproj" />
+    <Project Path="src/TvdeFleet.Infrastructure/TvdeFleet.Infrastructure.csproj" Id="b6d03130-70a7-4a12-8ba4-3b01edba9a08" />
+    <Project Path="src/TvdeFleet.MaponMock/TvdeFleet.MaponMock.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Project Path="TvdeFleetManagement.AppHost/TvdeFleetManagement.AppHost.csproj" Id="07b88cbd-f95d-4b62-be6f-fd8cafbbfac8" />
+  <Project Path="TvdeFleetManagement.ServiceDefaults/TvdeFleetManagement.ServiceDefaults.csproj" />
+</Solution>

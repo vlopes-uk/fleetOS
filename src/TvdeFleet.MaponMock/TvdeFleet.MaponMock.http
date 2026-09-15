@@ -1,0 +1,6 @@
+@TvdeFleet.MaponMock_HostAddress = http://localhost:5223
+
+GET {{TvdeFleet.MaponMock_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

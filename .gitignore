@@ -1,13 +1,30 @@
 # Windows
 Thumbs.db
 Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
 
 # VS Code
 .vscode/
 *.code-workspace
 
+# Visual Studio
+.vs/
+*.user
+*.suo
+
 # PowerShell
 *.ps1.lock
+import-mapping.json
+test-*.csv
 
 # Logs
 *.log
+logs/
+
+# Build artifacts (if code gets added later)
+bin/
+obj/
+node_modules/

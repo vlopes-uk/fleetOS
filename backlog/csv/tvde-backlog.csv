@@ -1,0 +1,310 @@
+temp_id,title,type,body,labels,parent_temp_id
+EPIC-1,"Epic 1: Platform Foundation & Authentication",Epic,"Establish core .NET solution database schema and secure authentication.","type: epic,module: core,priority: critical",
+EPIC-2,"Epic 2: Fleet & Vehicle Management",Epic,"Register track and manage every vehicle including compliance and telematics mapping.","type: epic,module: fleet,priority: high",
+EPIC-3,"Epic 3: Driver Management & Compliance",Epic,"Onboard drivers track CMTVDE and criminal record validity and manage assignments.","type: epic,module: drivers,priority: high",
+EPIC-4,"Epic 4: Trip & Revenue Synchronisation",Epic,"Ingest trip data from Uber mock API and Bolt CSV into a unified trips table.","type: epic,module: trips,priority: high",
+EPIC-5,"Epic 5: Telemetry (Mapon Mock)",Epic,"Build an API-faithful Mapon mock server and integrate via a provider-agnostic client.","type: epic,module: telemetry,priority: high",
+EPIC-6,"Epic 6: Billing Engine (3 Business Models)",Epic,"Automate billing cycles for rental profit-share and salary-plus-commission models.","type: epic,module: billing,priority: critical",
+EPIC-7,"Epic 7: Payments (Manual Workflow)",Epic,"Enable admins to mark payments as paid and notify drivers automatically.","type: epic,module: payments,priority: high",
+EPIC-8,"Epic 8: Incidents Complaints & Expenses",Epic,"Allow drivers to report incidents and expenses and managers to log complaints.","type: epic,module: incidents,priority: medium",
+EPIC-9,"Epic 9: Analytics Reporting & Export",Epic,"Provide dashboards vehicle comparisons driver rankings and tax exports.","type: epic,module: analytics,priority: medium",
+EPIC-10,"Epic 10: Mobile App & Push Notifications",Epic,"Deliver the .NET MAUI driver app with offline capability and push notifications.","type: epic,module: mobile,priority: high",
+EPIC-11,"Epic 11: Compliance Alert Engine",Epic,"Automatically scan and alert on all vehicle and driver compliance expiries.","type: epic,module: compliance,priority: critical",
+EPIC-12,"Epic 12: Settings & Administration",Epic,"Configure Mapon manage users and control system settings.","type: epic,module: settings,priority: medium",
+FEAT-1.1,"Feature 1.1: Solution Scaffolding",Feature,"Set up the .NET solution with API Blazor MAUI Functions and Mock projects.","type: feature,module: core",EPIC-1
+FEAT-1.2,"Feature 1.2: Database Schema & Migrations",Feature,"Create all tables indexes and partitions via EF Core migrations.","type: feature,module: core",EPIC-1
+FEAT-1.3,"Feature 1.3: JWT Authentication",Feature,"Implement login refresh and logout with JWT tokens.","type: feature,module: auth",EPIC-1
+FEAT-1.4,"Feature 1.4: RBAC Authorization",Feature,"Enforce role-based access control across all controllers.","type: feature,module: auth",EPIC-1
+STORY-1.1.1,"Story: Developer can build the solution locally",Story,"As a developer I want a solution with all projects so I can work consistently.","type: story,module: core",FEAT-1.1
+TASK-1.1.1.1,"Task: Create TvdeFleetManagement.sln",Task,"Create the solution file and add all src and test projects.","type: task,module: core",STORY-1.1.1
+TASK-1.1.1.2,"Task: Add all src and test projects",Task,"Create API Application Domain Infrastructure Functions MaponMock Blazor MAUI and test projects.","type: task,module: core",STORY-1.1.1
+TASK-1.1.1.3,"Task: Configure project references",Task,"Wire project references per the solution structure.","type: task,module: core",STORY-1.1.1
+TASK-1.1.1.4,"Task: Add NuGet packages per spec",Task,"Add EF Core SqlServer JwtBearer Functions Worker Polly CsvHelper AutoMapper FluentValidation Serilog.","type: task,module: core",STORY-1.1.1
+TASK-1.1.1.5,"Task: Set up appsettings per environment",Task,"Create Development Staging and Production appsettings with placeholders.","type: task,module: core",STORY-1.1.1
+STORY-1.2.1,"Story: Developer can apply migrations to a fresh DB",Story,"As a developer I want migrations that create the entire schema.","type: story,module: core",FEAT-1.2
+TASK-1.2.1.1,"Task: Create AppDbContext with all DbSets",Task,"Implement AppDbContext with DbSets for all entities.","type: task,module: core",STORY-1.2.1
+TASK-1.2.1.2,"Task: Configure entity relationships and constraints",Task,"Use EF Core fluent API for FKs check constraints unique indexes and filtered indexes.","type: task,module: core",STORY-1.2.1
+TASK-1.2.1.3,"Task: Add SQL Server partitioning for telematics_events",Task,"Create PF_Telematics_Monthly and PS_Telematics_Monthly partition scheme.","type: task,module: telemetry",STORY-1.2.1
+TASK-1.2.1.4,"Task: Add columnstore index on telematics_events",Task,"Create NCCI for analytics aggregations.","type: task,module: telemetry",STORY-1.2.1
+TASK-1.2.1.5,"Task: Generate initial migration",Task,"Run dotnet ef migrations add InitialCreate.","type: task,module: core",STORY-1.2.1
+TASK-1.2.1.6,"Task: Write seed data script",Task,"Seed operator admin user and reference data.","type: task,module: core",STORY-1.2.1
+STORY-1.3.1,"Story: User can log in with email and password",Story,"As a user I want to log in so I can access the platform securely.","type: story,module: auth",FEAT-1.3
+TASK-1.3.1.1,"Task: Implement POST /auth/login",Task,"Validate credentials against password_hash and return access plus refresh tokens.","type: task,module: auth",STORY-1.3.1
+TASK-1.3.1.2,"Task: Implement POST /auth/refresh",Task,"Refresh access token using a valid refresh token.","type: task,module: auth",STORY-1.3.1
+TASK-1.3.1.3,"Task: Implement POST /auth/logout",Task,"Revoke refresh token and invalidate session.","type: task,module: auth",STORY-1.3.1
+TASK-1.3.1.4,"Task: Configure JWT issuer audience signing key",Task,"Load from Key Vault in production.","type: task,module: auth",STORY-1.3.1
+TASK-1.3.1.5,"Task: Add bcrypt or PBKDF2 password hashing",Task,"Store only password hashes never plaintext.","type: task,module: auth",STORY-1.3.1
+TASK-1.3.1.6,"Task: Write auth unit tests",Task,"Cover login refresh logout and invalid credentials.","type: task,module: auth",STORY-1.3.1
+STORY-1.4.1,"Story: Admin can control role-based access",Story,"As an admin I want to restrict what each role can access.","type: story,module: auth",FEAT-1.4
+TASK-1.4.1.1,"Task: Define roles admin fleet_manager accountant viewer",Task,"Create role constants and seed them.","type: task,module: auth",STORY-1.4.1
+TASK-1.4.1.2,"Task: Create Authorize policies",Task,"Define named policies per controller.","type: task,module: auth",STORY-1.4.1
+TASK-1.4.1.3,"Task: Apply policies to all controllers",Task,"Annotate every endpoint with the appropriate role policy.","type: task,module: auth",STORY-1.4.1
+TASK-1.4.1.4,"Task: Write authorization tests",Task,"Verify each role is allowed or denied per endpoint.","type: task,module: auth",STORY-1.4.1
+FEAT-2.1,"Feature 2.1: Vehicle CRUD",Feature,"Allow fleet managers to add view edit and retire vehicles.","type: feature,module: fleet",EPIC-2
+FEAT-2.2,"Feature 2.2: Vehicle Compliance Tracking",Feature,"Record IPO insurance sticker and IMT registration details.","type: feature,module: fleet",EPIC-2
+FEAT-2.3,"Feature 2.3: Mapon Unit Mapping",Feature,"Link each vehicle to its Mapon unit ID.","type: feature,module: telemetry",EPIC-2
+FEAT-2.4,"Feature 2.4: Vehicle Analytics",Feature,"Show TCO revenue per km and utilisation per vehicle.","type: feature,module: fleet",EPIC-2
+STORY-2.1.1,"Story: Fleet manager can manage vehicle inventory",Story,"As a fleet manager I want to add view edit and retire vehicles.","type: story,module: fleet",FEAT-2.1
+TASK-2.1.1.1,"Task: Implement GET POST PUT /vehicles",Task,"CRUD endpoints with validation.","type: task,module: fleet",STORY-2.1.1
+TASK-2.1.1.2,"Task: Implement GET /vehicles/{id}",Task,"Return vehicle detail with compliance status.","type: task,module: fleet",STORY-2.1.1
+TASK-2.1.1.3,"Task: Add filters status make fuel_type",Task,"Support query-string filters on the list endpoint.","type: task,module: fleet",STORY-2.1.1
+TASK-2.1.1.4,"Task: Build Blazor Vehicles List page",Task,"Table with filters status chips and expiry warnings.","type: task,module: fleet",STORY-2.1.1
+TASK-2.1.1.5,"Task: Build Blazor Vehicles Detail page",Task,"Full profile with compliance telematics expenses incidents.","type: task,module: fleet",STORY-2.1.1
+TASK-2.1.1.6,"Task: Write API and UI tests",Task,"Cover CRUD filters and edge cases.","type: task,module: fleet",STORY-2.1.1
+STORY-2.2.1,"Story: Fleet manager can record and monitor compliance",Story,"As a fleet manager I want to track IPO insurance sticker and IMT reg.","type: story,module: fleet",FEAT-2.2
+TASK-2.2.1.1,"Task: Implement GET POST /vehicles/{id}/compliance",Task,"Add and retrieve compliance records.","type: task,module: fleet",STORY-2.2.1
+TASK-2.2.1.2,"Task: Add expiry alert calculation",Task,"Compute days-to-expiry and warning thresholds.","type: task,module: compliance",STORY-2.2.1
+TASK-2.2.1.3,"Task: Build compliance section on Vehicle Detail",Task,"Show all records with expiry countdown.","type: task,module: fleet",STORY-2.2.1
+TASK-2.2.1.4,"Task: Write compliance service unit tests",Task,"Cover expiry thresholds.","type: task,module: compliance",STORY-2.2.1
+STORY-2.3.1,"Story: Fleet manager can link a vehicle to Mapon",Story,"As a fleet manager I want to map a vehicle to its Mapon unit ID.","type: story,module: telemetry",FEAT-2.3
+TASK-2.3.1.1,"Task: Add mapon_unit_id and mapon_unit_number columns",Task,"EF Core migration adds the columns and unique index.","type: task,module: telemetry",STORY-2.3.1
+TASK-2.3.1.2,"Task: Build UI to search and link Mapon units",Task,"Query MaponClient for available units.","type: task,module: telemetry",STORY-2.3.1
+TASK-2.3.1.3,"Task: Handle unmapped vehicles gracefully",Task,"Display prompt to map and exclude from telemetry queries.","type: task,module: telemetry",STORY-2.3.1
+TASK-2.3.1.4,"Task: Write mapping validation tests",Task,"Cover unique constraint and null handling.","type: task,module: telemetry",STORY-2.3.1
+STORY-2.4.1,"Story: Fleet manager can compare vehicle performance",Story,"As a fleet manager I want TCO revenue per km and utilisation per vehicle.","type: story,module: analytics",FEAT-2.4
+TASK-2.4.1.1,"Task: Implement GET /vehicles/{id}/analytics",Task,"Return metrics per the spec.","type: task,module: analytics",STORY-2.4.1
+TASK-2.4.1.2,"Task: Implement GET /vehicles/analytics/compare",Task,"Compare makes and models by weighted score.","type: task,module: analytics",STORY-2.4.1
+TASK-2.4.1.3,"Task: Build Blazor Vehicles Comparison page",Task,"Side-by-side cards with charts.","type: task,module: analytics",STORY-2.4.1
+TASK-2.4.1.4,"Task: Add 5-minute cache for analytics",Task,"Use IMemoryCache with absolute expiry.","type: task,module: core",STORY-2.4.1
+TASK-2.4.1.5,"Task: Write aggregation tests",Task,"Cover revenue per km cost per km and scoring formula.","type: task,module: analytics",STORY-2.4.1
+FEAT-3.1,"Feature 3.1: Driver CRUD",Feature,"Register view and manage drivers.","type: feature,module: drivers",EPIC-3
+FEAT-3.2,"Feature 3.2: CMTVDE & Document Tracking",Feature,"Upload and track CMTVDE criminal record and training certs.","type: feature,module: drivers",EPIC-3
+FEAT-3.3,"Feature 3.3: Vehicle Assignment & Handover",Feature,"Assign vehicle to driver and log handover condition.","type: feature,module: drivers",EPIC-3
+FEAT-3.4,"Feature 3.4: Driver Performance Summary",Feature,"Show ratings complaints and incidents in one view.","type: feature,module: drivers",EPIC-3
+STORY-3.1.1,"Story: Fleet manager can manage drivers",Story,"As a fleet manager I want to register and edit drivers.","type: story,module: drivers",FEAT-3.1
+TASK-3.1.1.1,"Task: Implement GET POST PUT /drivers",Task,"CRUD endpoints with NIF and IBAN validation.","type: task,module: drivers",STORY-3.1.1
+TASK-3.1.1.2,"Task: Implement GET /drivers/{id}",Task,"Return driver detail with compliance and Mapon link.","type: task,module: drivers",STORY-3.1.1
+TASK-3.1.1.3,"Task: Build Blazor Drivers List page",Task,"Table with status CMTVDE expiry and rating.","type: task,module: drivers",STORY-3.1.1
+TASK-3.1.1.4,"Task: Build Blazor Drivers Detail page",Task,"Profile compliance docs trips earnings incidents complaints.","type: task,module: drivers",STORY-3.1.1
+TASK-3.1.1.5,"Task: Write API and UI tests",Task,"Cover CRUD and validation.","type: task,module: drivers",STORY-3.1.1
+STORY-3.2.1,"Story: Fleet manager can track driver documents",Story,"As a fleet manager I want to upload and track CMTVDE and other docs.","type: story,module: drivers",FEAT-3.2
+TASK-3.2.1.1,"Task: Implement GET POST /drivers/{id}/compliance",Task,"Add and retrieve driver compliance documents.","type: task,module: drivers",STORY-3.2.1
+TASK-3.2.1.2,"Task: Add document upload to Blob Storage",Task,"Store files and return URLs.","type: task,module: core",STORY-3.2.1
+TASK-3.2.1.3,"Task: Build compliance section on Driver Detail",Task,"Show docs with expiry countdown.","type: task,module: drivers",STORY-3.2.1
+TASK-3.2.1.4,"Task: Write expiry validation tests",Task,"Cover 30 15 and 7-day thresholds.","type: task,module: compliance",STORY-3.2.1
+STORY-3.3.1,"Story: Fleet manager can assign vehicle and log handover",Story,"As a fleet manager I want to assign a vehicle and capture handover.","type: story,module: drivers",FEAT-3.3
+TASK-3.3.1.1,"Task: Implement POST /drivers/{id}/assign-vehicle",Task,"Create driver_vehicle_assignments row.","type: task,module: drivers",STORY-3.3.1
+TASK-3.3.1.2,"Task: Implement handover log endpoints",Task,"Capture odometer fuel level photos and notes.","type: task,module: drivers",STORY-3.3.1
+TASK-3.3.1.3,"Task: Block assignment if compliance expired",Task,"Return 409 with reason.","type: task,module: compliance",STORY-3.3.1
+TASK-3.3.1.4,"Task: Build assignment UI in Blazor",Task,"Driver picker vehicle picker handover form.","type: task,module: drivers",STORY-3.3.1
+TASK-3.3.1.5,"Task: Write assignment tests",Task,"Cover compliance blocks and happy path.","type: task,module: drivers",STORY-3.3.1
+STORY-3.4.1,"Story: Fleet manager can see driver performance",Story,"As a fleet manager I want ratings complaints and incidents in one view.","type: story,module: drivers",FEAT-3.4
+TASK-3.4.1.1,"Task: Implement GET /drivers/{id}/performance",Task,"Aggregate from ratings complaints and incidents.","type: task,module: analytics",STORY-3.4.1
+TASK-3.4.1.2,"Task: Aggregate from ratings complaints incidents",Task,"Compute averages counts and trends.","type: task,module: analytics",STORY-3.4.1
+TASK-3.4.1.3,"Task: Build performance card on Driver Detail",Task,"Charts and KPI tiles.","type: task,module: drivers",STORY-3.4.1
+TASK-3.4.1.4,"Task: Write aggregation tests",Task,"Cover averages and edge cases.","type: task,module: analytics",STORY-3.4.1
+FEAT-4.1,"Feature 4.1: Uber Sync (Azure Function)",Feature,"Sync Uber payment data every 15 minutes.","type: feature,module: trips",EPIC-4
+FEAT-4.2,"Feature 4.2: Bolt CSV Import",Feature,"Upload Bolt CSV exports to import historical trips.","type: feature,module: trips",EPIC-4
+FEAT-4.3,"Feature 4.3: Trip List & Detail",Feature,"Browse and filter trips by driver vehicle platform and date.","type: feature,module: trips",EPIC-4
+STORY-4.1.1,"Story: Fleet manager gets Uber data synced automatically",Story,"As a fleet manager I want Uber payments synced every 15 minutes.","type: story,module: trips",FEAT-4.1
+TASK-4.1.1.1,"Task: Create UberSyncFunction (Timer trigger)",Task,"Runs every 15 minutes via Azure Functions.","type: task,module: trips",STORY-4.1.1
+TASK-4.1.1.2,"Task: Implement Uber mock API client",Task,"Mirror the Uber Driver API payments endpoint.","type: task,module: trips",STORY-4.1.1
+TASK-4.1.1.3,"Task: Paginate 10-day windows",Task,"Respect the 10-day max range per query.","type: task,module: trips",STORY-4.1.1
+TASK-4.1.1.4,"Task: Convert cents to EUR and map Unix timestamp",Task,"Transform amounts and event_time to internal types.","type: task,module: trips",STORY-4.1.1
+TASK-4.1.1.5,"Task: Deduplicate on platform_trip_id",Task,"Upsert or skip existing trips.","type: task,module: trips",STORY-4.1.1
+TASK-4.1.1.6,"Task: Log to integration_sync_logs",Task,"Record status counts and error details.","type: task,module: core",STORY-4.1.1
+TASK-4.1.1.7,"Task: Write sync tests",Task,"Cover pagination dedupe and error paths.","type: task,module: trips",STORY-4.1.1
+STORY-4.2.1,"Story: Fleet manager can upload Bolt CSV export",Story,"As a fleet manager I want to import historical Bolt trips.","type: story,module: trips",FEAT-4.2
+TASK-4.2.1.1,"Task: Implement POST /integrations/bolt/import",Task,"Accept multipart CSV upload.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.2,"Task: Parse with CsvHelper",Task,"Read rows into typed objects.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.3,"Task: Validate headers and data types",Task,"Reject malformed files with a clear error.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.4,"Task: Deduplicate on order_time driver_id and ride_price",Task,"Skip existing rows.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.5,"Task: Return import summary",Task,"Imported skipped errors per row.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.6,"Task: Build upload UI in Blazor",Task,"File picker with progress and result.","type: task,module: trips",STORY-4.2.1
+TASK-4.2.1.7,"Task: Write parser and import tests",Task,"Cover valid invalid and partial files.","type: task,module: trips",STORY-4.2.1
+STORY-4.3.1,"Story: Fleet manager can browse and filter trips",Story,"As a fleet manager I want to audit trips by driver vehicle and date.","type: story,module: trips",FEAT-4.3
+TASK-4.3.1.1,"Task: Implement GET /trips with filters",Task,"Driver vehicle platform and date range.","type: task,module: trips",STORY-4.3.1
+TASK-4.3.1.2,"Task: Implement GET /trips/{id}",Task,"Return trip detail with platform breakdown.","type: task,module: trips",STORY-4.3.1
+TASK-4.3.1.3,"Task: Build Blazor Trips page with filters",Task,"Paginated table and filter bar.","type: task,module: trips",STORY-4.3.1
+TASK-4.3.1.4,"Task: Add export to CSV",Task,"Stream filtered results as CSV.","type: task,module: trips",STORY-4.3.1
+TASK-4.3.1.5,"Task: Write query tests",Task,"Cover filter combinations and pagination.","type: task,module: trips",STORY-4.3.1
+FEAT-5.1,"Feature 5.1: Mapon Mock Server",Feature,"Standalone mock that mirrors the Mapon REST contract.","type: feature,module: telemetry",EPIC-5
+FEAT-5.2,"Feature 5.2: MaponClient Integration",Feature,"Single client that works against mock and real Mapon via config.","type: feature,module: telemetry",EPIC-5
+FEAT-5.3,"Feature 5.3: Mapon Sync Function",Feature,"Sync positions unit data and routes every 5 minutes.","type: feature,module: telemetry",EPIC-5
+FEAT-5.4,"Feature 5.4: Live Fleet Map",Feature,"Live map of all vehicles with status.","type: feature,module: telemetry",EPIC-5
+STORY-5.1.1,"Story: Developer can develop without real Mapon API",Story,"As a developer I want an API-faithful mock so I can develop offline.","type: story,module: telemetry",FEAT-5.1
+TASK-5.1.1.1,"Task: Create TvdeFleet.MaponMock project",Task,"Standalone ASP.NET Core minimal API.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.2,"Task: Implement /unit/list.json",Task,"Return units with GPS metadata.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.3,"Task: Implement /unit_data/list.json",Task,"Return mileage fuel ignition and CAN.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.4,"Task: Implement /route/list.json",Task,"Return route history for a unit.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.5,"Task: Implement /driver/list.json",Task,"Return drivers registered in telematics.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.6,"Task: Implement ApiKeyMiddleware",Task,"Enforce key validation with Mapon-style 401 envelope.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.7,"Task: Implement ConcurrencyLimitMiddleware",Task,"Return 429 when 5 concurrent requests exceeded.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.8,"Task: Create MockFleetSeeder",Task,"Seed realistic Portuguese fleet.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.9,"Task: Create VehicleMovementSimulator",Task,"Update positions every 5-30s within Lisbon and Porto.","type: task,module: telemetry",STORY-5.1.1
+TASK-5.1.1.10,"Task: Write contract tests",Task,"Verify mock and real Mapon schema alignment.","type: task,module: telemetry",STORY-5.1.1
+STORY-5.2.1,"Story: Developer can switch mock and real via config",Story,"As a developer I want a single client so switching is BaseUrl only.","type: story,module: telemetry",FEAT-5.2
+TASK-5.2.1.1,"Task: Define IMaponClient interface",Task,"GetUnits GetUnitData GetRoutes GetDrivers.","type: task,module: telemetry",STORY-5.2.1
+TASK-5.2.1.2,"Task: Implement MaponClient with Polly retry and bulkhead",Task,"Retry 3x exponential and limit to 4 concurrent.","type: task,module: telemetry",STORY-5.2.1
+TASK-5.2.1.3,"Task: Add MaponOptions configuration",Task,"BaseUrl ApiKey SyncIntervalMinutes Enabled.","type: task,module: telemetry",STORY-5.2.1
+TASK-5.2.1.4,"Task: Register HttpClient in DI",Task,"Typed client with Polly policies.","type: task,module: telemetry",STORY-5.2.1
+TASK-5.2.1.5,"Task: Write unit and integration tests",Task,"Cover parsing retries and rate-limit handling.","type: task,module: telemetry",STORY-5.2.1
+STORY-5.3.1,"Story: Fleet manager gets telemetry synced every 5 minutes",Story,"As a fleet manager I want up-to-date positions and mileage.","type: story,module: telemetry",FEAT-5.3
+TASK-5.3.1.1,"Task: Create MaponSyncFunction (Timer trigger)",Task,"5-minute schedule via Azure Functions.","type: task,module: telemetry",STORY-5.3.1
+TASK-5.3.1.2,"Task: Upsert positions unit data and routes",Task,"Write to telematics_events.","type: task,module: telemetry",STORY-5.3.1
+TASK-5.3.1.3,"Task: Write to telematics_events partitioned table",Task,"Rely on SQL Server partition scheme.","type: task,module: telemetry",STORY-5.3.1
+TASK-5.3.1.4,"Task: Populate IMemoryCache for live map",Task,"30-second TTL snapshot.","type: task,module: core",STORY-5.3.1
+TASK-5.3.1.5,"Task: Log to background_job_logs",Task,"Status counts errors.","type: task,module: core",STORY-5.3.1
+TASK-5.3.1.6,"Task: Write sync tests",Task,"Cover happy path and Mapon errors.","type: task,module: telemetry",STORY-5.3.1
+STORY-5.4.1,"Story: Fleet manager can see live vehicle positions",Story,"As a fleet manager I want a live map of all vehicles.","type: story,module: telemetry",FEAT-5.4
+TASK-5.4.1.1,"Task: Implement GET /telematics/vehicles",Task,"Serve from IMemoryCache.","type: task,module: telemetry",STORY-5.4.1
+TASK-5.4.1.2,"Task: Build Blazor map component with Leaflet",Task,"Render markers per vehicle.","type: task,module: telemetry",STORY-5.4.1
+TASK-5.4.1.3,"Task: Poll every 30 seconds from cache",Task,"Avoid DB hits per tick.","type: task,module: telemetry",STORY-5.4.1
+TASK-5.4.1.4,"Task: Show vehicle status moving idle offline",Task,"Color-code markers.","type: task,module: telemetry",STORY-5.4.1
+TASK-5.4.1.5,"Task: Write map integration tests",Task,"Cover cache and JS interop.","type: task,module: telemetry",STORY-5.4.1
+FEAT-6.1,"Feature 6.1: Rental Billing (Model 1)",Feature,"Generate weekly or monthly rental invoices.","type: feature,module: billing",EPIC-6
+FEAT-6.2,"Feature 6.2: Profit Share Billing (Model 2)",Feature,"Calculate profit-share settlements.","type: feature,module: billing",EPIC-6
+FEAT-6.3,"Feature 6.3: Salary + Commission Billing (Model 3)",Feature,"Calculate payroll with base salary commission IRS and TSU.","type: feature,module: billing",EPIC-6
+FEAT-6.4,"Feature 6.4: Penalty & Bonus Engine",Feature,"Apply penalties and bonuses based on complaints accidents ratings.","type: feature,module: billing",EPIC-6
+FEAT-6.5,"Feature 6.5: Billing Cycle Function",Feature,"Generate billing cycles weekly via Azure Function.","type: feature,module: billing",EPIC-6
+STORY-6.1.1,"Story: Accountant gets rental invoices generated",Story,"As an accountant I want weekly or monthly rental invoices.","type: story,module: billing",FEAT-6.1
+TASK-6.1.1.1,"Task: Implement billing logic for rental contracts",Task,"Read rental_weekly_rate or rental_monthly_rate.","type: task,module: billing",STORY-6.1.1
+TASK-6.1.1.2,"Task: Create rental_fee line items",Task,"One line per billing cycle.","type: task,module: billing",STORY-6.1.1
+TASK-6.1.1.3,"Task: Apply penalties from complaints and incidents",Task,"Add negative lines from penalty engine.","type: task,module: billing",STORY-6.1.1
+TASK-6.1.1.4,"Task: Build Billing Cycles review UI",Task,"List approve and invoice.","type: task,module: billing",STORY-6.1.1
+TASK-6.1.1.5,"Task: Write billing tests",Task,"Cover rental cycle math.","type: task,module: billing",STORY-6.1.1
+STORY-6.2.1,"Story: Accountant gets profit-share settlements",Story,"As an accountant I want profit-share calculated automatically.","type: story,module: billing",FEAT-6.2
+TASK-6.2.1.1,"Task: Aggregate trips and expenses per driver and period",Task,"Sum net_earning and expenses.","type: task,module: billing",STORY-6.2.1
+TASK-6.2.1.2,"Task: Apply profit_share_driver_pct",Task,"Split net revenue per contract.","type: task,module: billing",STORY-6.2.1
+TASK-6.2.1.3,"Task: Add expense reimbursement lines",Task,"Reimburse eligible expenses.","type: task,module: billing",STORY-6.2.1
+TASK-6.2.1.4,"Task: Apply penalty engine",Task,"Subtract penalties from driver share.","type: task,module: billing",STORY-6.2.1
+TASK-6.2.1.5,"Task: Build review UI",Task,"Show revenue expenses split penalties net.","type: task,module: billing",STORY-6.2.1
+TASK-6.2.1.6,"Task: Write billing tests",Task,"Cover 45/55 split and edge cases.","type: task,module: billing",STORY-6.2.1
+STORY-6.3.1,"Story: Accountant gets payroll calculated with IRS and TSU",Story,"As an accountant I want employee payroll computed correctly.","type: story,module: billing",FEAT-6.3
+TASK-6.3.1.1,"Task: Prorate base salary",Task,"Prorate for the billing period.","type: task,module: billing",STORY-6.3.1
+TASK-6.3.1.2,"Task: Calculate commission from net earnings",Task,"commission = net_earning * commission_pct.","type: task,module: billing",STORY-6.3.1
+TASK-6.3.1.3,"Task: Compute IRS withholding",Task,"Apply monthly withholding table.","type: task,module: billing",STORY-6.3.1
+TASK-6.3.1.4,"Task: Compute TSU employee and employer",Task,"21.4% total general regime.","type: task,module: billing",STORY-6.3.1
+TASK-6.3.1.5,"Task: Generate payslip data",Task,"Structured output for export.","type: task,module: billing",STORY-6.3.1
+TASK-6.3.1.6,"Task: Write payroll tests",Task,"Cover IRS TSU and net pay.","type: task,module: billing",STORY-6.3.1
+STORY-6.4.1,"Story: Fleet manager gets penalties and bonuses applied",Story,"As a fleet manager I want automatic adjustments to driver earnings.","type: story,module: billing",FEAT-6.4
+TASK-6.4.1.1,"Task: Implement complaint penalty logic",Task,"Deduct penalty_applied from driver share.","type: task,module: billing",STORY-6.4.1
+TASK-6.4.1.2,"Task: Implement at-fault accident amortisation",Task,"Spread repair cost over N cycles.","type: task,module: billing",STORY-6.4.1
+TASK-6.4.1.3,"Task: Implement rating threshold deduction",Task,"Reduce commission if avg below 4.5.","type: task,module: billing",STORY-6.4.1
+TASK-6.4.1.4,"Task: Implement perfect rating bonus",Task,"Add bonus if avg above 4.9 and zero complaints.","type: task,module: billing",STORY-6.4.1
+TASK-6.4.1.5,"Task: Write rule engine tests",Task,"Cover each rule and interactions.","type: task,module: billing",STORY-6.4.1
+STORY-6.5.1,"Story: Developer gets billing cycles generated weekly",Story,"As a developer I want a weekly billing function.","type: story,module: billing",FEAT-6.5
+TASK-6.5.1.1,"Task: Create BillingCycleFunction (Timer Mon 00:00)",Task,"Weekly scheduled Azure Function.","type: task,module: billing",STORY-6.5.1
+TASK-6.5.1.2,"Task: Load active contracts by business model",Task,"Group by rental profit_share salary_plus.","type: task,module: billing",STORY-6.5.1
+TASK-6.5.1.3,"Task: Call appropriate billing service",Task,"Dispatch per model.","type: task,module: billing",STORY-6.5.1
+TASK-6.5.1.4,"Task: Save billing_cycles and line items",Task,"Persist with status draft.","type: task,module: billing",STORY-6.5.1
+TASK-6.5.1.5,"Task: Log to background_job_logs",Task,"Record counts and errors.","type: task,module: core",STORY-6.5.1
+TASK-6.5.1.6,"Task: Write function tests",Task,"Cover each business model.","type: task,module: billing",STORY-6.5.1
+FEAT-7.1,"Feature 7.1: Pending Payments List",Feature,"Show all pending payments with driver IBANs.","type: feature,module: payments",EPIC-7
+FEAT-7.2,"Feature 7.2: Mark Payment as Paid",Feature,"Record payment completion with audit trail.","type: feature,module: payments",EPIC-7
+FEAT-7.3,"Feature 7.3: Driver Notification",Feature,"Push notification when payment is processed.","type: feature,module: payments",EPIC-7
+STORY-7.1.1,"Story: Accountant can see all pending payments",Story,"As an accountant I want pending payments with IBANs to process.","type: story,module: payments",FEAT-7.1
+TASK-7.1.1.1,"Task: Implement GET /payments/pending",Task,"Return pending records with driver info.","type: task,module: payments",STORY-7.1.1
+TASK-7.1.1.2,"Task: Build Blazor Billing Payments page",Task,"Filterable table of pending payments.","type: task,module: payments",STORY-7.1.1
+TASK-7.1.1.3,"Task: Show driver name amount IBAN",Task,"Columns with copy-to-clipboard for IBAN.","type: task,module: payments",STORY-7.1.1
+TASK-7.1.1.4,"Task: Add CSV and PDF export",Task,"For bank transfer batches.","type: task,module: payments",STORY-7.1.1
+TASK-7.1.1.5,"Task: Write query tests",Task,"Cover filters and edge cases.","type: task,module: payments",STORY-7.1.1
+STORY-7.2.1,"Story: Accountant can mark payment as paid",Story,"As an accountant I want an audit trail when marking payments.","type: story,module: payments",FEAT-7.2
+TASK-7.2.1.1,"Task: Implement POST /payments/{id}/mark-paid",Task,"Body includes method reference notify flag.","type: task,module: payments",STORY-7.2.1
+TASK-7.2.1.2,"Task: Update payment_records.status to paid",Task,"Set status and marked_paid_at.","type: task,module: payments",STORY-7.2.1
+TASK-7.2.1.3,"Task: Record marked_paid_at and marked_paid_by",Task,"Capture admin user from JWT.","type: task,module: payments",STORY-7.2.1
+TASK-7.2.1.4,"Task: Write payment tests",Task,"Cover status transitions and audit fields.","type: task,module: payments",STORY-7.2.1
+STORY-7.3.1,"Story: Driver receives push when payment processed",Story,"As a driver I want a push notification so I know payment was sent.","type: story,module: payments",FEAT-7.3
+TASK-7.3.1.1,"Task: Create NotifyDriverFunction (Queue trigger)",Task,"Process driver-notifications queue.","type: task,module: payments",STORY-7.3.1
+TASK-7.3.1.2,"Task: Enqueue message from mark-paid endpoint",Task,"Fire-and-forget after status update.","type: task,module: payments",STORY-7.3.1
+TASK-7.3.1.3,"Task: Send via Azure Notification Hubs",Task,"Deliver to registered device tokens.","type: task,module: payments",STORY-7.3.1
+TASK-7.3.1.4,"Task: Update driver_notified_at",Task,"Record delivery time.","type: task,module: payments",STORY-7.3.1
+TASK-7.3.1.5,"Task: Build MAUI Payment Status page",Task,"List of payments with paid indicator.","type: task,module: mobile",STORY-7.3.1
+TASK-7.3.1.6,"Task: Write notification tests",Task,"Cover queue and hub integration.","type: task,module: payments",STORY-7.3.1
+FEAT-8.1,"Feature 8.1: Driver Expense Logging",Feature,"Log expenses with photos and GPS.","type: feature,module: incidents",EPIC-8
+FEAT-8.2,"Feature 8.2: Incident Reporting",Feature,"Report accidents damage or theft with photos.","type: feature,module: incidents",EPIC-8
+FEAT-8.3,"Feature 8.3: Complaint Management",Feature,"Log and resolve customer complaints with penalties.","type: feature,module: incidents",EPIC-8
+STORY-8.1.1,"Story: Driver can log expenses with photo",Story,"As a driver I want to log expenses so I can be reimbursed.","type: story,module: incidents",FEAT-8.1
+TASK-8.1.1.1,"Task: Implement POST /expenses",Task,"Accept expense with receipt photo.","type: task,module: incidents",STORY-8.1.1
+TASK-8.1.1.2,"Task: Build MAUI Log Expense page",Task,"Category picker amount photo capture.","type: task,module: mobile",STORY-8.1.1
+TASK-8.1.1.3,"Task: Capture GPS and photo",Task,"Attach GPS coordinates and receipt image.","type: task,module: mobile",STORY-8.1.1
+TASK-8.1.1.4,"Task: Support offline logging with SQLite",Task,"Store pending entries locally.","type: task,module: mobile",STORY-8.1.1
+TASK-8.1.1.5,"Task: Sync when online",Task,"Push queued expenses when connectivity returns.","type: task,module: mobile",STORY-8.1.1
+TASK-8.1.1.6,"Task: Write expense tests",Task,"Cover online and offline paths.","type: task,module: incidents",STORY-8.1.1
+STORY-8.2.1,"Story: Driver can report accidents with photos",Story,"As a driver I want to report incidents so my manager is informed.","type: story,module: incidents",FEAT-8.2
+TASK-8.2.1.1,"Task: Implement POST /incidents",Task,"Accept incident with photos.","type: task,module: incidents",STORY-8.2.1
+TASK-8.2.1.2,"Task: Build MAUI Report Incident page",Task,"Type severity description photo capture.","type: task,module: mobile",STORY-8.2.1
+TASK-8.2.1.3,"Task: Capture GPS and photos",Task,"Attach location and multiple photos.","type: task,module: mobile",STORY-8.2.1
+TASK-8.2.1.4,"Task: Set severity and at_fault flag",Task,"Mandatory fields for triage.","type: task,module: incidents",STORY-8.2.1
+TASK-8.2.1.5,"Task: Notify fleet manager",Task,"Email or in-app alert.","type: task,module: incidents",STORY-8.2.1
+TASK-8.2.1.6,"Task: Write incident tests",Task,"Cover reporting and notification.","type: task,module: incidents",STORY-8.2.1
+STORY-8.3.1,"Story: Fleet manager can log and resolve complaints",Story,"As a fleet manager I want to resolve complaints with a penalty.","type: story,module: incidents",FEAT-8.3
+TASK-8.3.1.1,"Task: Implement GET POST /complaints",Task,"List and create complaints.","type: task,module: incidents",STORY-8.3.1
+TASK-8.3.1.2,"Task: Implement PUT /complaints/{id}/resolve",Task,"Set resolution notes and penalty.","type: task,module: incidents",STORY-8.3.1
+TASK-8.3.1.3,"Task: Build Blazor Complaints page",Task,"List with filters and resolve modal.","type: task,module: incidents",STORY-8.3.1
+TASK-8.3.1.4,"Task: Link penalty to billing engine",Task,"Expose penalty for next cycle.","type: task,module: billing",STORY-8.3.1
+TASK-8.3.1.5,"Task: Write complaint tests",Task,"Cover resolution and penalty flow.","type: task,module: incidents",STORY-8.3.1
+FEAT-9.1,"Feature 9.1: Fleet Analytics Dashboard",Feature,"Fleet KPIs at a glance.","type: feature,module: analytics",EPIC-9
+FEAT-9.2,"Feature 9.2: Vehicle Comparison",Feature,"Compare makes and models by TCO revenue per km and rating.","type: feature,module: analytics",EPIC-9
+FEAT-9.3,"Feature 9.3: Driver Ranking",Feature,"Rank drivers by performance.","type: feature,module: analytics",EPIC-9
+FEAT-9.4,"Feature 9.4: Tax Export (IVA and IRS)",Feature,"Export IVA and IRS data for the accountant.","type: feature,module: analytics",EPIC-9
+STORY-9.1.1,"Story: Fleet manager sees fleet KPIs",Story,"As a fleet manager I want a dashboard with key metrics.","type: story,module: analytics",FEAT-9.1
+TASK-9.1.1.1,"Task: Implement GET /analytics/fleet-overview",Task,"Return revenue costs utilisation alerts.","type: task,module: analytics",STORY-9.1.1
+TASK-9.1.1.2,"Task: Build Blazor Dashboard page",Task,"KPI tiles and summary charts.","type: task,module: analytics",STORY-9.1.1
+TASK-9.1.1.3,"Task: Show revenue costs utilisation alerts",Task,"Sourced from cached aggregates.","type: task,module: analytics",STORY-9.1.1
+TASK-9.1.1.4,"Task: Cache aggregates with 5-min TTL",Task,"Use IMemoryCache.","type: task,module: core",STORY-9.1.1
+TASK-9.1.1.5,"Task: Write dashboard tests",Task,"Cover metric calculations.","type: task,module: analytics",STORY-9.1.1
+STORY-9.2.1,"Story: Fleet manager can compare makes and models",Story,"As a fleet manager I want to see which cars perform best.","type: story,module: analytics",FEAT-9.2
+TASK-9.2.1.1,"Task: Implement GET /analytics/vehicle-comparison",Task,"Return scored comparison.","type: task,module: analytics",STORY-9.2.1
+TASK-9.2.1.2,"Task: Calculate Vehicle Score",Task,"Weighted formula per business logic.","type: task,module: analytics",STORY-9.2.1
+TASK-9.2.1.3,"Task: Build Blazor Vehicles Comparison page",Task,"Side-by-side cards.","type: task,module: analytics",STORY-9.2.1
+TASK-9.2.1.4,"Task: Add chart visualisations",Task,"Bar and line charts per metric.","type: task,module: analytics",STORY-9.2.1
+TASK-9.2.1.5,"Task: Write comparison tests",Task,"Cover scoring and edge cases.","type: task,module: analytics",STORY-9.2.1
+STORY-9.3.1,"Story: Fleet manager can rank drivers",Story,"As a fleet manager I want to identify top and low performers.","type: story,module: analytics",FEAT-9.3
+TASK-9.3.1.1,"Task: Implement GET /analytics/driver-ranking",Task,"Return ranked drivers.","type: task,module: analytics",STORY-9.3.1
+TASK-9.3.1.2,"Task: Aggregate ratings complaints revenue trips",Task,"Composite score per driver.","type: task,module: analytics",STORY-9.3.1
+TASK-9.3.1.3,"Task: Build Blazor Analytics Drivers page",Task,"Ranked table with trend sparklines.","type: task,module: analytics",STORY-9.3.1
+TASK-9.3.1.4,"Task: Write ranking tests",Task,"Cover scoring formula.","type: task,module: analytics",STORY-9.3.1
+STORY-9.4.1,"Story: Accountant can export IVA and IRS data",Story,"As an accountant I want to file taxes correctly.","type: story,module: analytics",FEAT-9.4
+TASK-9.4.1.1,"Task: Implement GET /reports/tax-export",Task,"Return CSV for the period.","type: task,module: analytics",STORY-9.4.1
+TASK-9.4.1.2,"Task: Build CSV with IVA 6% and IRS withholding",Task,"One row per relevant transaction.","type: task,module: analytics",STORY-9.4.1
+TASK-9.4.1.3,"Task: Build Blazor Reports Tax page",Task,"Period picker and download button.","type: task,module: analytics",STORY-9.4.1
+TASK-9.4.1.4,"Task: Write export tests",Task,"Cover IVA and IRS totals.","type: task,module: analytics",STORY-9.4.1
+FEAT-10.1,"Feature 10.1: MAUI App Scaffolding",Feature,"MAUI project with all screens and navigation.","type: feature,module: mobile",EPIC-10
+FEAT-10.2,"Feature 10.2: Offline Sync",Feature,"Log expenses and incidents offline and sync later.","type: feature,module: mobile",EPIC-10
+FEAT-10.3,"Feature 10.3: Push Notifications",Feature,"Payment and compliance alerts via push.","type: feature,module: mobile",EPIC-10
+STORY-10.1.1,"Story: Developer has MAUI project with all screens",Story,"As a developer I want the MAUI project ready to build.","type: story,module: mobile",FEAT-10.1
+TASK-10.1.1.1,"Task: Create TvdeFleet.Maui project",Task,"MAUI app targeting iOS and Android.","type: task,module: mobile",STORY-10.1.1
+TASK-10.1.1.2,"Task: Create all Views and ViewModels",Task,"Login Dashboard Trips Expenses Incidents Earnings Payments Compliance.","type: task,module: mobile",STORY-10.1.1
+TASK-10.1.1.3,"Task: Configure Shell navigation",Task,"Route registration and tab structure.","type: task,module: mobile",STORY-10.1.1
+TASK-10.1.1.4,"Task: Add API Auth Location Notification services",Task,"Typed HttpClient auth storage GPS push.","type: task,module: mobile",STORY-10.1.1
+TASK-10.1.1.5,"Task: Write UI tests",Task,"Cover navigation and view rendering.","type: task,module: mobile",STORY-10.1.1
+STORY-10.2.1,"Story: Driver can log expenses and incidents offline",Story,"As a driver I want to work without connectivity.","type: story,module: mobile",FEAT-10.2
+TASK-10.2.1.1,"Task: Implement SQLite local storage",Task,"Local tables for pending expenses and incidents.","type: task,module: mobile",STORY-10.2.1
+TASK-10.2.1.2,"Task: Queue expenses and incidents for sync",Task,"Persist to local store with pending flag.","type: task,module: mobile",STORY-10.2.1
+TASK-10.2.1.3,"Task: Sync when connectivity returns",Task,"Detect network and flush queue.","type: task,module: mobile",STORY-10.2.1
+TASK-10.2.1.4,"Task: Show pending badge",Task,"Badge on nav items.","type: task,module: mobile",STORY-10.2.1
+TASK-10.2.1.5,"Task: Write offline sync tests",Task,"Cover queue and flush.","type: task,module: mobile",STORY-10.2.1
+STORY-10.3.1,"Story: Driver receives push notifications",Story,"As a driver I want push for payment and compliance alerts.","type: story,module: mobile",FEAT-10.3
+TASK-10.3.1.1,"Task: Configure Azure Notification Hubs",Task,"Register app and obtain connection string.","type: task,module: mobile",STORY-10.3.1
+TASK-10.3.1.2,"Task: Implement PushNotificationFunction",Task,"Queue-triggered delivery.","type: task,module: mobile",STORY-10.3.1
+TASK-10.3.1.3,"Task: Register device tokens in MAUI",Task,"Store token per user in API.","type: task,module: mobile",STORY-10.3.1
+TASK-10.3.1.4,"Task: Handle notification tap to navigate",Task,"Deep link into Payment or Compliance page.","type: task,module: mobile",STORY-10.3.1
+TASK-10.3.1.5,"Task: Write notification tests",Task,"Cover delivery and deep links.","type: task,module: mobile",STORY-10.3.1
+FEAT-11.1,"Feature 11.1: Daily Compliance Scan",Feature,"Daily scan of all compliance expiries.","type: feature,module: compliance",EPIC-11
+FEAT-11.2,"Feature 11.2: Alert Notifications",Feature,"Email and push alerts for expiring documents.","type: feature,module: compliance",EPIC-11
+STORY-11.1.1,"Story: Fleet manager gets daily scan of all expiries",Story,"As a fleet manager I want daily scanning so I never miss a renewal.","type: story,module: compliance",FEAT-11.1
+TASK-11.1.1.1,"Task: Create ComplianceAlertFunction (Timer daily 06:00)",Task,"Daily scheduled Azure Function.","type: task,module: compliance",STORY-11.1.1
+TASK-11.1.1.2,"Task: Scan vehicle IMT reg insurance IPO sticker",Task,"Query vehicle_compliance_records.","type: task,module: compliance",STORY-11.1.1
+TASK-11.1.1.3,"Task: Scan driver CMTVDE criminal record licence",Task,"Query drivers and driver_compliance_documents.","type: task,module: compliance",STORY-11.1.1
+TASK-11.1.1.4,"Task: Scan vehicle age 10y or 12y EV",Task,"Flag for decommissioning.","type: task,module: compliance",STORY-11.1.1
+TASK-11.1.1.5,"Task: Generate alerts at 30 15 and 7-day thresholds",Task,"Classify warning vs critical.","type: task,module: compliance",STORY-11.1.1
+TASK-11.1.1.6,"Task: Write alert tests",Task,"Cover thresholds and blocking rules.","type: task,module: compliance",STORY-11.1.1
+STORY-11.2.1,"Story: Driver or manager receives expiring-doc alerts",Story,"As a driver or manager I want alerts so I can renew in time.","type: story,module: compliance",FEAT-11.2
+TASK-11.2.1.1,"Task: Enqueue notifications from alert engine",Task,"Queue driver-notifications messages.","type: task,module: compliance",STORY-11.2.1
+TASK-11.2.1.2,"Task: Send via NotifyDriverFunction",Task,"Email or push per preference.","type: task,module: compliance",STORY-11.2.1
+TASK-11.2.1.3,"Task: Build Blazor Compliance Alerts page",Task,"List upcoming expiries with filters.","type: task,module: compliance",STORY-11.2.1
+TASK-11.2.1.4,"Task: Write notification tests",Task,"Cover delivery channels.","type: task,module: compliance",STORY-11.2.1
+FEAT-12.1,"Feature 12.1: Mapon Settings",Feature,"Configure Mapon base URL API key and sync interval.","type: feature,module: settings",EPIC-12
+FEAT-12.2,"Feature 12.2: User Management",Feature,"Create edit and deactivate users and assign roles.","type: feature,module: settings",EPIC-12
+STORY-12.1.1,"Story: Admin can configure Mapon settings",Story,"As an admin I want to configure Mapon so telemetry works.","type: story,module: settings",FEAT-12.1
+TASK-12.1.1.1,"Task: Build Blazor Settings Mapon page",Task,"Form for base URL API key and interval.","type: task,module: settings",STORY-12.1.1
+TASK-12.1.1.2,"Task: Store settings securely in Key Vault",Task,"Never store API key in plaintext.","type: task,module: settings",STORY-12.1.1
+TASK-12.1.1.3,"Task: Add Test Connection button",Task,"Call MaponClient GetUnitsAsync.","type: task,module: settings",STORY-12.1.1
+TASK-12.1.1.4,"Task: Show sync status and last sync time",Task,"Query background_job_logs.","type: task,module: settings",STORY-12.1.1
+TASK-12.1.1.5,"Task: Write settings tests",Task,"Cover save and test-connection.","type: task,module: settings",STORY-12.1.1
+STORY-12.2.1,"Story: Admin can manage users",Story,"As an admin I want to create edit and deactivate users.","type: story,module: settings",FEAT-12.2
+TASK-12.2.1.1,"Task: Implement GET POST PUT /users",Task,"CRUD with role assignment.","type: task,module: settings",STORY-12.2.1
+TASK-12.2.1.2,"Task: Build Blazor Settings Users page",Task,"Table with role column and deactivate toggle.","type: task,module: settings",STORY-12.2.1
+TASK-12.2.1.3,"Task: Assign roles",Task,"Dropdown with admin fleet_manager accountant viewer.","type: task,module: settings",STORY-12.2.1
+TASK-12.2.1.4,"Task: Write user management tests",Task,"Cover role assignment and deactivation.","type: task,module: settings",STORY-12.2.1

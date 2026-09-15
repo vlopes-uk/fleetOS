@@ -2,32 +2,21 @@
 .SYNOPSIS
     Creates GitHub issues from the TVDE backlog CSV and links parent/child relationships.
 .DESCRIPTION
-    Two-pass import:
-      Pass 1 - Create every issue, capturing temp_id -> issue number.
-      Pass 2 - Link children to parents via gh issue edit --set-parent.
-
-    Idempotent enough to re-run: if an issue title already exists in the repo,
-    it is reused rather than duplicated.
-
-    Requires gh CLI v2.94.0+ for --set-parent support.
+    Two-pass import with idempotent behaviour. Auto-detects whether the target
+    repo supports issue types and gracefully skips --type if not.
 .PARAMETER CsvFile
-    Path to the CSV file. Defaults to ..\csv\tvde-backlog.csv relative to the script.
+    Path to the CSV. Defaults to ..\csv\tvde-backlog.csv relative to this script.
 .PARAMETER Repo
     Target repository in owner/name format.
 .PARAMETER Delay
-    Seconds between API calls. Default 1.5. Increase if rate-limited.
+    Seconds between API calls. Default 1.5.
 .PARAMETER SkipLinking
-    Create issues only, skip the parent-linking pass. Useful for debugging.
-.EXAMPLE
-    .\csv-to-github.ps1 -Repo "my-org/fleetOS"
-
-.EXAMPLE
-    .\csv-to-github.ps1 -CsvFile "C:\temp\backlog.csv" -Repo "my-org/fleetOS" -Delay 3
+    Create issues only, skip the parent-linking pass.
 #>
 
 [CmdletBinding()]
 param(
-    [string]$CsvFile = (Join-Path $PSScriptRoot '..\csv\tvde-backlog.csv'),
+    [string]$CsvFile = '',
     [Parameter(Mandatory = $true)]
     [string]$Repo,
     [double]$Delay = 1.5,
@@ -36,25 +25,27 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# ---- Resolve script folder -------------------------------------------------
+$scriptDir = $PSScriptRoot
+if ([string]::IsNullOrWhiteSpace($scriptDir)) {
+    if ($MyInvocation.MyCommand.Path) {
+        $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    } else {
+        $scriptDir = (Get-Location).Path
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($CsvFile)) {
+    $CsvFile = Join-Path $scriptDir '..\csv\tvde-backlog.csv'
+}
+
 # ---- Verify gh CLI ---------------------------------------------------------
 try {
     $ghRaw = (gh --version | Select-Object -First 1)
     Write-Host "gh CLI: $ghRaw" -ForegroundColor DarkGray
-
-    # Extract version number
-    if ($ghRaw -match 'gh version (\d+)\.(\d+)') {
-        $major = [int]$Matches[1]
-        $minor = [int]$Matches[2]
-        if ($major -lt 2 -or ($major -eq 2 -and $minor -lt 94)) {
-            Write-Host "Warning: --set-parent requires gh v2.94.0+." -ForegroundColor Yellow
-            Write-Host "Your version: $major.$minor. Parent linking may fail." -ForegroundColor Yellow
-            Write-Host "Run: winget upgrade --id GitHub.cli" -ForegroundColor Yellow
-        }
-    }
 }
 catch {
     Write-Host "GitHub CLI (gh) is not installed or not on PATH." -ForegroundColor Red
-    Write-Host "Install it with: winget install --id GitHub.cli -e" -ForegroundColor Yellow
     exit 1
 }
 
@@ -62,11 +53,34 @@ catch {
 Write-Host "Verifying access to $Repo..." -ForegroundColor Cyan
 gh repo view $Repo --json name 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Cannot access $Repo. Check the name and your authentication." -ForegroundColor Red
+    Write-Host "Cannot access $Repo." -ForegroundColor Red
     exit 1
 }
 
-# ---- Load and validate CSV -------------------------------------------------
+# ---- Detect issue type support ---------------------------------------------
+$script:availableTypes = @()
+
+Write-Host "Checking issue type support..." -ForegroundColor DarkGray
+$owner = $Repo.Split('/')[0]
+try {
+    $typesJson = gh api "orgs/$owner/issue-types" --jq '.[].name' 2>$null
+    if ($LASTEXITCODE -eq 0 -and $typesJson) {
+        $script:availableTypes = @(
+            $typesJson -split "`n" |
+                ForEach-Object { $_.Trim() } |
+                Where-Object { $_ }
+        )
+    }
+}
+catch { }
+
+if ($script:availableTypes.Count -gt 0) {
+    Write-Host ("  Types available: {0}" -f ($script:availableTypes -join ', ')) -ForegroundColor DarkGray
+} else {
+    Write-Host "  No issue types available — using labels only." -ForegroundColor DarkYellow
+}
+
+# ---- Load CSV --------------------------------------------------------------
 if (-not (Test-Path $CsvFile)) {
     Write-Host "CSV file not found: $CsvFile" -ForegroundColor Red
     exit 1
@@ -81,28 +95,51 @@ if ($rows.Count -eq 0) {
     exit 1
 }
 
-$requiredColumns = @('temp_id', 'title')
-$missing = $requiredColumns | Where-Object { $_ -notin $rows[0].PSObject.Properties.Name }
-if ($missing) {
-    Write-Host ("CSV is missing required columns: {0}" -f ($missing -join ', ')) -ForegroundColor Red
-    exit 1
-}
-
 $hasTypeColumn   = 'type'           -in $rows[0].PSObject.Properties.Name
 $hasBodyColumn   = 'body'           -in $rows[0].PSObject.Properties.Name
 $hasLabelsColumn = 'labels'         -in $rows[0].PSObject.Properties.Name
 $hasParentColumn = 'parent_temp_id' -in $rows[0].PSObject.Properties.Name
 
 Write-Host ("Loaded {0} rows. Target: {1}" -f $rows.Count, $Repo) -ForegroundColor Cyan
-Write-Host ("Delay between calls: {0}s" -f $Delay) -ForegroundColor DarkGray
 Write-Host ""
 
-# ---- Helpers ---------------------------------------------------------------
+# ---- Issue cache -----------------------------------------------------------
+$script:issueCache = $null
+
+function Initialize-IssueCache {
+    if ($null -ne $script:issueCache) { return }
+    Write-Host "Fetching existing issues..." -ForegroundColor DarkGray
+    $script:issueCache = @{}
+
+    $json = gh issue list --repo $Repo --state all --limit 5000 --json number,title 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $json) {
+        Write-Host "  Could not fetch — assuming empty." -ForegroundColor DarkYellow
+        return
+    }
+
+    $issues = $json | ConvertFrom-Json
+    foreach ($issue in $issues) {
+        $script:issueCache[$issue.title] = $issue.number
+    }
+    Write-Host ("  Loaded {0} existing issues" -f $script:issueCache.Count) -ForegroundColor DarkGray
+}
+
+function Get-ExistingIssueNumber {
+    param([string]$Title)
+    Initialize-IssueCache
+    if ($script:issueCache.ContainsKey($Title)) { return $script:issueCache[$Title] }
+    return $null
+}
+
+function Add-IssueToCache {
+    param([string]$Title, [int]$Number)
+    if ($null -eq $script:issueCache) { $script:issueCache = @{} }
+    $script:issueCache[$Title] = $Number
+}
+
+# ---- Retry helper ----------------------------------------------------------
 function Invoke-GhWithRetry {
-    param(
-        [string[]]$Arguments,
-        [int]$MaxAttempts = 5
-    )
+    param([string[]]$Arguments, [int]$MaxAttempts = 5)
     $attempt = 1
     while ($attempt -le $MaxAttempts) {
         $output = & gh @Arguments 2>&1
@@ -110,31 +147,20 @@ function Invoke-GhWithRetry {
         if ($exitCode -eq 0) {
             return @{ Success = $true; Output = $output }
         }
-        if ($output -match 'rate limit|429|secondary rate') {
+        if ("$output" -match 'rate limit|429|secondary rate') {
             $wait = 60 * $attempt
-            Write-Host ("    rate limited, waiting {0}s (attempt {1}/{2})" -f $wait, $attempt, $MaxAttempts) -ForegroundColor DarkYellow
+            Write-Host ("    rate limited, waiting {0}s" -f $wait) -ForegroundColor DarkYellow
             Start-Sleep -Seconds $wait
             $attempt++
             continue
         }
-        return @{ Success = $false; Output = $output }
+        return @{ Success = $false; Output = "$output" }
     }
     return @{ Success = $false; Output = "Exceeded retry attempts" }
 }
 
-function Get-ExistingIssueNumber {
-    param([string]$Title)
-    # Search exact title in open + closed issues
-    $json = gh issue list --repo $Repo --state all --search "`"$Title`" in:title" --json number,title --limit 100 2>$null
-    if ($LASTEXITCODE -ne 0 -or -not $json) { return $null }
-    $issues = $json | ConvertFrom-Json
-    $match = $issues | Where-Object { $_.title -eq $Title } | Select-Object -First 1
-    if ($match) { return $match.number }
-    return $null
-}
-
 # ---- Pass 1: Create all issues ---------------------------------------------
-$mapping = @{}      # temp_id -> issue number
+$mapping = @{}
 $created = 0
 $reused  = 0
 $failed  = 0
@@ -147,7 +173,6 @@ foreach ($row in $rows) {
     $title  = $row.title.Trim()
 
     if ([string]::IsNullOrWhiteSpace($tempId) -or [string]::IsNullOrWhiteSpace($title)) {
-        Write-Host "  Skipping row with empty temp_id or title" -ForegroundColor DarkYellow
         continue
     }
 
@@ -157,7 +182,6 @@ foreach ($row in $rows) {
 
     Write-Host ("  [{0}] {1}" -f $tempId, $title) -ForegroundColor Gray
 
-    # ---- Check for existing issue (idempotency) ----
     $existing = Get-ExistingIssueNumber -Title $title
     if ($existing) {
         $mapping[$tempId] = $existing
@@ -166,7 +190,6 @@ foreach ($row in $rows) {
         continue
     }
 
-    # ---- Build gh arguments ----
     $ghArgs = @(
         'issue', 'create',
         '--repo', $Repo,
@@ -174,25 +197,27 @@ foreach ($row in $rows) {
         '--body', $body
     )
 
-    if ($type)   { $ghArgs += @('--type',  $type) }
+    # Only pass --type if the repo actually supports the requested type
+    if ($type -and ($script:availableTypes -contains $type)) {
+        $ghArgs += @('--type', $type)
+    }
+
     if ($labels) { $ghArgs += @('--label', $labels) }
 
-    # ---- Create ----
     $result = Invoke-GhWithRetry -Arguments $ghArgs
     if ($result.Success) {
         $url = $result.Output | Select-Object -Last 1
-        if ($url -match '(\d+)\s*$') {
+        if ("$url" -match '(\d+)\s*$') {
             $num = [int]$Matches[1]
             $mapping[$tempId] = $num
+            Add-IssueToCache -Title $title -Number $num
             Write-Host ("    -> #{0}" -f $num) -ForegroundColor DarkGreen
             $created++
-        }
-        else {
-            Write-Host ("    !! Created but could not parse issue number from: {0}" -f $url) -ForegroundColor Red
+        } else {
+            Write-Host ("    !! Could not parse number: {0}" -f $url) -ForegroundColor Red
             $failed++
         }
-    }
-    else {
+    } else {
         Write-Host ("    !! Failed: {0}" -f $result.Output) -ForegroundColor Red
         $failed++
     }
@@ -204,8 +229,8 @@ Write-Host ""
 Write-Host ("Pass 1 complete. Created: {0}, Reused: {1}, Failed: {2}" -f $created, $reused, $failed) -ForegroundColor Yellow
 Write-Host ""
 
-# ---- Save mapping to disk (for recovery) -----------------------------------
-$mappingPath = Join-Path $PSScriptRoot 'import-mapping.json'
+# ---- Save mapping ----------------------------------------------------------
+$mappingPath = Join-Path $scriptDir 'import-mapping.json'
 $mapping.GetEnumerator() | ForEach-Object {
     [PSCustomObject]@{ temp_id = $_.Key; number = $_.Value }
 } | ConvertTo-Json | Out-File -FilePath $mappingPath -Encoding UTF8
@@ -213,7 +238,7 @@ Write-Host "Mapping saved to $mappingPath" -ForegroundColor DarkGray
 
 # ---- Pass 2: Link parents --------------------------------------------------
 if ($SkipLinking) {
-    Write-Host "Skipping Pass 2 (--SkipLinking)." -ForegroundColor Yellow
+    Write-Host "Skipping Pass 2." -ForegroundColor Yellow
     exit 0
 }
 
@@ -225,43 +250,38 @@ if (-not $hasParentColumn) {
 Write-Host "=== Pass 2: Linking parent relationships ===" -ForegroundColor Yellow
 Write-Host ""
 
-$linked     = 0
-$linkFailed = 0
+$linked       = 0
+$linkFailed   = 0
 $skipNoParent = 0
 
 foreach ($row in $rows) {
     $tempId       = $row.temp_id.Trim()
     $parentTempId = if ($row.parent_temp_id) { $row.parent_temp_id.Trim() } else { '' }
 
-    if ([string]::IsNullOrWhiteSpace($parentTempId)) {
-        $skipNoParent++
-        continue
-    }
-    if (-not $mapping.ContainsKey($tempId)) {
-        Write-Host ("  {0}: no issue number in mapping, skipping" -f $tempId) -ForegroundColor DarkYellow
-        continue
-    }
-    if (-not $mapping.ContainsKey($parentTempId)) {
-        Write-Host ("  {0}: parent {1} not in mapping, skipping" -f $tempId, $parentTempId) -ForegroundColor DarkYellow
-        continue
-    }
+    if ([string]::IsNullOrWhiteSpace($parentTempId)) { $skipNoParent++; continue }
+    if (-not $mapping.ContainsKey($tempId))           { continue }
+    if (-not $mapping.ContainsKey($parentTempId))     { continue }
 
     $childNum  = $mapping[$tempId]
     $parentNum = $mapping[$parentTempId]
 
-    Write-Host ("  Linking #{0} ({1}) -> #{2} ({3})" -f $childNum, $tempId, $parentNum, $parentTempId) -ForegroundColor Gray
+    Write-Host ("  Linking #{0} -> #{1}" -f $childNum, $parentNum) -ForegroundColor Gray
 
     $result = Invoke-GhWithRetry -Arguments @(
-        'issue', 'edit', $childNum,
+        'issue', 'edit', "$childNum",
         '--repo', $Repo,
-        '--set-parent', $parentNum
+        '--set-parent', "$parentNum"
     )
 
     if ($result.Success) {
         $linked++
-    }
-    else {
-        Write-Host ("    !! Failed to link: {0}" -f $result.Output) -ForegroundColor Red
+    } else {
+        # Detect unsupported sub-issues and stop trying (saves API calls)
+        if ("$($result.Output)" -match 'not found|not supported|unknown flag') {
+            Write-Host "    !! Sub-issues not supported in this repo — stopping linking." -ForegroundColor Red
+            break
+        }
+        Write-Host ("    !! Failed: {0}" -f $result.Output) -ForegroundColor Red
         $linkFailed++
     }
 
@@ -271,21 +291,10 @@ foreach ($row in $rows) {
 # ---- Summary ---------------------------------------------------------------
 Write-Host ""
 Write-Host "=== Done ===" -ForegroundColor Green
-Write-Host ("  Issues created:  {0}" -f $created) -ForegroundColor Green
-Write-Host ("  Issues reused:   {0}" -f $reused)  -ForegroundColor DarkYellow
-Write-Host ("  Issues failed:   {0}" -f $failed)  -ForegroundColor $(if ($failed -gt 0) { 'Red' } else { 'Gray' })
-Write-Host ("  Parent links:    {0}" -f $linked)  -ForegroundColor Green
-Write-Host ("  Link failures:   {0}" -f $linkFailed) -ForegroundColor $(if ($linkFailed -gt 0) { 'Red' } else { 'Gray' })
-Write-Host ("  Leaf nodes:      {0}" -f $skipNoParent) -ForegroundColor DarkGray
+Write-Host ("  Created:       {0}" -f $created)     -ForegroundColor Green
+Write-Host ("  Reused:        {0}" -f $reused)      -ForegroundColor DarkYellow
+Write-Host ("  Failed:        {0}" -f $failed)      -ForegroundColor $(if ($failed -gt 0) { 'Red' } else { 'Gray' })
+Write-Host ("  Links:         {0}" -f $linked)      -ForegroundColor Green
+Write-Host ("  Link failures: {0}" -f $linkFailed)  -ForegroundColor $(if ($linkFailed -gt 0) { 'Red' } else { 'Gray' })
+Write-Host ("  Leaf nodes:    {0}" -f $skipNoParent) -ForegroundColor DarkGray
 Write-Host ""
-
-if ($failed -eq 0 -and $linkFailed -eq 0) {
-    Write-Host "Verify with:" -ForegroundColor Cyan
-    Write-Host ("  gh issue list --repo {0} --type Epic" -f $Repo) -ForegroundColor Gray
-    Write-Host ("  gh issue view <number> --repo {0}" -f $Repo) -ForegroundColor Gray
-    exit 0
-}
-else {
-    Write-Host "Some operations failed. Re-run the script â€” existing issues will be reused." -ForegroundColor Yellow
-    exit 1
-}
